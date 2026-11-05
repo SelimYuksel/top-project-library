@@ -11,6 +11,10 @@ class Book {
     toggleReadStatus() {
         this.isRead = !this.isRead;
     }
+
+    static fromJSON(obj) {
+        return new Book(obj.title, obj.author, obj.pages, obj.isRead, obj.id);
+    }
 }
 
 // Functions to manage the library
@@ -29,8 +33,17 @@ class Library {
         this.saveToLocalStorage();
     }
 
+    toggleRead(id) {
+        const book = this.getBook(id);
+        if(book) {
+            book.toggleReadStatus();
+            this.saveToLocalStorage();
+        }
+        
+    }
+
     updateBook(id, updatedData) {
-        const book = this.books.find(b => b.id === id);
+        const book = this.getBook(id);
         if (book) {
             book.title = updatedData.title;
             book.author = updatedData.author;
@@ -50,7 +63,7 @@ class Library {
 
     loadFromLocalStorage() {
         const data = localStorage.getItem('library');
-        return data ? JSON.parse(data) : [];
+        return data ? JSON.parse(data).map(Book.fromJSON): [];
     }
 }
 
@@ -145,6 +158,7 @@ class LibraryUI {
             <div class="book-actions">
                 <button class="btn btn-edit" data-id="${book.id}">Edit</button>
                 <button class="btn btn-delete" data-id="${book.id}">Delete</button>
+                <button class="btn btn-toggle" data-id="${book.id}">Toggle Read</button>
             </div>
         `;
 
@@ -158,6 +172,11 @@ class LibraryUI {
             if (confirm(`Are you sure you want to delete "${book.title}"?`)) {
                 this.deleteBook(book.id);
             }
+        });
+
+        //Toggle button
+        div.querySelector('.btn-toggle').addEventListener('click', () => {
+            this.toggleRead(book.id);
         });
 
         return div;
@@ -201,6 +220,11 @@ class LibraryUI {
 
     deleteBook(id) {
         this.library.deleteBook(id);
+        this.displayBooks();
+    }
+
+    toggleRead(id) {
+        this.library.toggleRead(id);
         this.displayBooks();
     }
 }

@@ -255,6 +255,16 @@ h6 {
     background: #c82333;
 }
 
+.btn-toggle {
+    flex: 1;
+    background: orange;
+    color: white;
+}
+
+.btn-toggle:hover {
+    background: #dd9105
+}
+
 .btn-update {
     width: 100%;
     background: #28a745;
